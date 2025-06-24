@@ -1,5 +1,4 @@
-![Emir'in Logo Tasarımı](https://github.com/vest06/EmirBot-v0.3/blob/main/file_000000008de06243a9bee8a1eb9e94b8.png?raw=true)
-
+![Yeni Logo](https://github.com/vest06/My-logo/blob/main/IMG_20250624_235649.png?raw=true)
 
 # EmirBot-3o 🤖 
 
