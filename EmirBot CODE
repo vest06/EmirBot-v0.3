@@ -1,0 +1,229 @@
+import socket
+import requests
+import difflib
+from kivy.app import App
+from kivy.uix.boxlayout import BoxLayout
+from kivy.uix.floatlayout import FloatLayout
+from kivy.uix.scrollview import ScrollView
+from kivy.uix.label import Label
+from kivy.uix.textinput import TextInput
+from kivy.uix.button import Button
+from kivy.core.window import Window
+from kivy.graphics import Color, RoundedRectangle
+from kivy.animation import Animation
+import wikipedia
+import webbrowser
+
+# Pencere arkaplanı siyah
+Window.clearcolor = (0, 0, 0, 1)
+
+# Hava durumu API fonksiyonu
+def hava_durumu_al(sehir="Ankara"):
+    url = f"https://wttr.in/{sehir}?format=j1"
+    try:
+        response = requests.get(url)
+        if response.status_code == 200:
+            data = response.json()
+            anlik = data['current_condition'][0]
+            derece = anlik['temp_C']
+            durum = anlik['weatherDesc'][0]['value']
+            return f"{sehir} için hava şu anda: {durum}, {derece}°C"
+        else:
+            return "Hava durumu verisi alınamadı."
+    except Exception as e:
+        return f"Hata oluştu: {e}"
+
+# Basit soru-cevap veritabanı (örnek, toplam 200+ olacak şekilde genişlet)
+simple_qa = {
+    "selam": "Selam! Nasılsın?",
+    "nasılsın": "İyiyim, teşekkürler! Sen nasılsın?",
+    "hava nasıl": "hava",
+    "kimsin": "Ben EmirBot-3o, senin dijital dostun!",
+    "adın ne": "Benim adım EmirBot-3o, yani senin sohbet arkadaşın!",
+    "kaç yaşındasın": "Yaşım yok, ama hep genç kalıyorum! 😎",
+    "en sevdiğin oyun": "Araba yarış oyunları, biliyorum sen de seversin!",
+    "bana şaka yap": "Neden bilgisayar denize düşmüş? Çünkü surf yapıyormuş! 😂",
+    "seni seviyorum": "Ben de seni seviyorum dostum! ❤️",
+    "kötü hissettiğimde ne yapmalıyım": "Biraz nefes al, sevdiğin bir şeye odaklan. Ben buradayım!",
+    # ... (buraya 200 soruluk veri ekleyebilirsin)
+}
+
+# Küfür listesi
+kufur_listesi = ["sikeyim", "aptal", "salak", "oç", "amk", "yarrak", "orospu", "piç", "yarak", "sik"]
+
+class ChatApp(App):
+    def build(self):
+        self.root = BoxLayout(orientation='vertical', padding=10, spacing=10)
+
+        # Başlık animasyonu bölümü
+        title_box = FloatLayout(size_hint=(1, 0.12))
+        self.shadow_label = Label(
+            text='EmirBot-3o.', font_size='32sp', bold=True,
+            color=(1, 0.6, 0.8, 0.3), size_hint=(None, None),
+            pos_hint={'center_x': 0.500, 'center_y': 0.52}
+        )
+        self.title_label = Label(
+            text='EmirBot-3o', font_size='32sp', bold=True,
+            color=(1, 0.6, 0.8, 1), size_hint=(None, None),
+            pos_hint={'center_x': 0.5, 'center_y': 0.52}
+        )
+        title_box.add_widget(self.shadow_label)
+        title_box.add_widget(self.title_label)
+        self.root.add_widget(title_box)
+
+        # Sohbet geçmişi alanı
+        self.scroll = ScrollView(size_hint=(1, 0.75))
+        self.chat_history = BoxLayout(orientation='vertical', size_hint_y=None, spacing=10)
+        self.chat_history.bind(minimum_height=self.chat_history.setter('height'))
+        self.scroll.add_widget(self.chat_history)
+
+        # Girdi ve buton kutusu
+        self.input_box = BoxLayout(size_hint=(1, 0.15), spacing=10)
+        self.text_input = TextInput(
+            hint_text='Mesajınızı yazın...',
+            multiline=False, size_hint=(0.8, 1),
+            background_color=(0.9, 0.9, 0.95, 1),
+            foreground_color=(0, 0, 0, 1)
+        )
+        self.send_button = Button(
+            text='Gönder', size_hint=(0.2, 1),
+            background_color=(1, 1, 1, 1),
+            color=(0, 0, 0, 1)
+        )
+        self.send_button.bind(on_press=self.send_message)
+        self.input_box.add_widget(self.text_input)
+        self.input_box.add_widget(self.send_button)
+
+        self.root.add_widget(self.scroll)
+        self.root.add_widget(self.input_box)
+
+        self.start_title_animation()
+
+        return self.root
+
+    def start_title_animation(self):
+        self.animate_title(to_pink=False)
+
+    def animate_title(self, to_pink):
+        # Pembe-mavi neon geçiş animasyonu
+        color = (1, 0.6, 0.8, 1) if to_pink else (0.5, 0.8, 1, 1)
+        anim = Animation(color=color, duration=6.09)
+        anim.bind(on_complete=lambda *_: self.animate_title(not to_pink))
+        anim.start(self.title_label)
+
+    def get_local_ip(self):
+        try:
+            s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+            s.connect(("8.8.8.8", 80))
+            ip = s.getsockname()[0]
+            s.close()
+            return ip
+        except:
+            return "IP alınamadı"
+
+    def send_message(self, instance):
+        user_input = self.text_input.text.strip()
+        if not user_input:
+            return
+
+        # Küfür kontrolü
+        if any(kufur in user_input.lower() for kufur in kufur_listesi):
+            self.add_message("Küfür etme dostum, yoksa sana küçük bir sürprizim var! 😈", align='left', sender='bot')
+            return
+
+        self.add_message(user_input, align='right', sender='user')
+        self.text_input.text = ''
+
+        # Küfürlü espiri modu (kendi adınla dalga geçme)
+        if "emiri sikeyim" in user_input.lower():
+            user_ip = self.get_local_ip()
+            self.add_message(f"Emir Siker, IP adresin: {user_ip}", align='left', sender='bot')
+            self.add_message("Telefonuna RAT girdi! Geçmiş olsun! 😂", align='left', sender='bot')
+            return
+
+        matched_answer = self.find_simple_answer(user_input.lower())
+        if matched_answer:
+            if matched_answer == "hava":
+                cevap = hava_durumu_al()
+                self.add_message(cevap, align='left', sender='bot')
+            else:
+                self.add_message(matched_answer, align='left', sender='bot')
+        else:
+            self.get_info(user_input)
+
+    def find_simple_answer(self, user_input):
+        max_ratio = 0
+        best_match = None
+        for question in simple_qa.keys():
+            ratio = difflib.SequenceMatcher(None, user_input, question).ratio()
+            if ratio > max_ratio:
+                max_ratio = ratio
+                best_match = question
+        if max_ratio > 0.7:
+            return simple_qa[best_match]
+        return None
+
+    def add_message(self, text, align='left', sender='bot'):
+        bg_color = (0.6, 0.8, 1, 1) if sender == 'user' else (1, 1, 1, 1)
+        text_color = (0, 0, 0, 1)
+
+        bubble = BoxLayout(size_hint_y=None, padding=10)
+        label = Label(
+            text=text,
+            size_hint_y=None,
+            text_size=(self.root.width * 0.7, None),
+            color=text_color,
+            halign='left' if align == 'left' else 'right',
+            valign='middle'
+        )
+        label.bind(texture_size=lambda inst, val: self.update_height(bubble, label))
+        bubble.add_widget(label)
+
+        def draw_bg(instance, value):
+            instance.canvas.before.clear()
+            with instance.canvas.before:
+                Color(*bg_color)
+                RoundedRectangle(pos=instance.pos, size=instance.size, radius=[15])
+
+        bubble.bind(pos=draw_bg, size=draw_bg)
+        self.chat_history.add_widget(bubble)
+        self.scroll.scroll_y = 0
+
+    def update_height(self, bubble, label):
+        bubble.height = label.texture_size[1] + 20
+        label.height = label.texture_size[1]
+
+    def get_info(self, message):
+        api_key = "1c573c8a6751a7869c6b5a9dd5443a02d25401428e4ce2dff9ffb96ba757c943"
+        params = {
+            "q": message,
+            "api_key": api_key,
+            "engine": "google",
+            "hl": "tr"
+        }
+        try:
+            response = requests.get("https://serpapi.com/search", params=params)
+            data = response.json()
+            answer = data.get("answer_box", {}).get("snippet") or \
+                     data.get("answer_box", {}).get("answer") or \
+                     data.get("organic_results", [{}])[0].get("snippet")
+
+            if answer:
+                self.add_message(answer, align='left', sender='bot')
+                link = data.get("organic_results", [{}])[0].get("link")
+                if link:
+                    btn = Button(text='Devamını Oku', size_hint_y=None, height=40)
+                    btn.bind(on_press=lambda x: webbrowser.open(link))
+                    self.chat_history.add_widget(btn)
+                    self.scroll.scroll_y = 0
+            else:
+                try:
+                    summary = wikipedia.summary(message, sentences=2, auto_suggest=False, redirect=True)
+                    self.add_message(summary, align='left', sender='bot')
+                except Exception:
+                    self.add_message("Üzgünüm, bu konuda bir bilgi bulamadım.", align='left', sender='bot')
+        except Exception:
+            self.add_message("Bir hata oluştu, lütfen daha sonra tekrar dene.", align='left', sender='bot')
+
+if __name__ == "__main__":
+    ChatApp().run()
