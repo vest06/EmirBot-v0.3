@@ -1,3 +1,6 @@
+![Logo](https://[.](https://github.com/vest06/EmirBot-v0.3/blob/main/file_000000008de06243a9bee8a1eb9e94b8%20(3).png?raw=true)
+
+
 # EmirBot-3o 🤖 
 
 **EmirBot-3o**, tamamen Python ve Kivy kullanılarak geliştirilmiş bir mobil sohbet uygulamasıdır. Bu uygulama, kullanıcıyla doğal bir şekilde sohbet edebilen, espriler yapabilen, Google üzerinden bilgi arayabilen, Wikipedia'dan özetler çekebilen ve hatta hava durumu verisini canlı olarak gösterebilen bir yapay zeka sohbet botudur.
