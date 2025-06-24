@@ -1,4 +1,4 @@
-![Logo]([ ](https://github.com/vest06/EmirBot-v0.3/blob/main/file_000000008de06243a9bee8a1eb9e94b8%20(3).png?raw=true)
+![Emir'in Logo Tasarımı](https://github.com/vest06/EmirBot-v0.3/blob/main/file_000000008de06243a9bee8a1eb9e94b8.png?raw=true)
 
 
 # EmirBot-3o 🤖 
