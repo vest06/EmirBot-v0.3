@@ -1,4 +1,4 @@
-![Yeni Logo](https://github.com/vest06/My-logo/blob/main/IMG_20250624_235649.png?raw=true)
+![Yeni Logo](https://github.com/vest06/My-logo/blob/main/IMG_20250624_235649.png.png?raw=true)
 
 # EmirBot-3o 🤖 
 
