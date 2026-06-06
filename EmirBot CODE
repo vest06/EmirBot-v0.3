@@ -40,10 +40,10 @@ simple_qa = {
     "hava nasıl": "hava",
     "kimsin": "Ben EmirBot-3o, senin dijital dostun!",
     "adın ne": "Benim adım EmirBot-3o, yani senin sohbet arkadaşın!",
-    "kaç yaşındasın": "Yaşım yok, ama hep genç kalıyorum! 😎",
+    "kaç yaşındasın": "Yaşım yok, ama hep genç kalıyorum!",
     "en sevdiğin oyun": "Araba yarış oyunları, biliyorum sen de seversin!",
-    "bana şaka yap": "Neden bilgisayar denize düşmüş? Çünkü surf yapıyormuş! 😂",
-    "seni seviyorum": "Ben de seni seviyorum dostum! ❤️",
+    "bana şaka yap": "Neden bilgisayar denize düşmüş? Çünkü surf yapıyormuş!",
+    "seni seviyorum": "Ben de seni seviyorum dostum!",
     "kötü hissettiğimde ne yapmalıyım": "Biraz nefes al, sevdiğin bir şeye odaklan. Ben buradayım!",
     # ... (buraya 200 soruluk veri ekleyebilirsin)
 }
@@ -128,7 +128,7 @@ class ChatApp(App):
 
         # Küfür kontrolü
         if any(kufur in user_input.lower() for kufur in kufur_listesi):
-            self.add_message("Küfür etme dostum, yoksa sana küçük bir sürprizim var! 😈", align='left', sender='bot')
+            self.add_message("Küfür etme dostum, yoksa sana küçük bir sürprizim var!", align='left', sender='bot')
             return
 
         self.add_message(user_input, align='right', sender='user')
@@ -138,7 +138,7 @@ class ChatApp(App):
         if "emiri sikeyim" in user_input.lower():
             user_ip = self.get_local_ip()
             self.add_message(f"Emir Siker, IP adresin: {user_ip}", align='left', sender='bot')
-            self.add_message("Telefonuna RAT girdi! Geçmiş olsun! 😂", align='left', sender='bot')
+            self.add_message("Telefonuna RAT girdi! Geçmiş olsun!", align='left', sender='bot')
             return
 
         matched_answer = self.find_simple_answer(user_input.lower())
